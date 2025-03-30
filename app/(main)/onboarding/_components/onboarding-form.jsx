@@ -100,6 +100,7 @@ const OnboardingForm = ({ industries }) => {
                   setValue("subIndustry", "");
                 }}
               >
+
                 <SelectTrigger id="industry">
                   <SelectValue placeholder="Select an industry" />
                 </SelectTrigger>
@@ -170,7 +171,7 @@ const OnboardingForm = ({ industries }) => {
               <Label htmlFor="skills">Skills</Label>
               <Input
                 id="skills"
-                placeholder="e.g., Python, JavaScript, Project Management"
+                placeholder="e.g.,Java, Python, Project Management"
                 {...register("skills")}
               />
               <p className="text-sm text-muted-foreground">
