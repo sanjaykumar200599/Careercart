@@ -58,17 +58,21 @@ const inter = Inter({ subsets: ["latin"] }); // font
 
 export const metadata = {
   title: "AI Career Coach - Your Path to Success",
-  description: "Boost your career with personalized AI guidance, interview coaching, and professional development tools.",
-  keywords: "AI career coach, job interview prep, resume builder, career guidance, professional development",
+  description:
+    "Boost your career with personalized AI guidance, interview coaching, and professional development tools.",
+  keywords:
+    "AI career coach, job interview prep, resume builder, career guidance, professional development",
   openGraph: {
     title: "AI Career Coach - Your Path to Success",
-    description: "Boost your career with personalized AI guidance, interview coaching, and professional development tools.",
+    description:
+      "Boost your career with personalized AI guidance, interview coaching, and professional development tools.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "AI Career Coach - Your Path to Success",
-    description: "Boost your career with personalized AI guidance, interview coaching, and professional development tools.",
+    description:
+      "Boost your career with personalized AI guidance, interview coaching, and professional development tools.",
   },
 };
 
@@ -87,15 +91,21 @@ export default function RootLayout({ children }) {
           formButtonPrimary: "btn-modern-primary",
           card: "glass-strong rounded-2xl border-white/10",
           headerTitle: "gradient-text-primary",
-          socialButtonsBlockButton: "glass border-white/20 hover:glass-strong",
-          formFieldInput: "glass-subtle border-white/20 focus:border-blue-400",
+          socialButtonsBlockButton:
+            "glass border-white/20 hover:glass-strong",
+          formFieldInput:
+            "glass-subtle border-white/20 focus:border-blue-400",
         },
       }}
     >
       <html lang="en" suppressHydrationWarning>
         <head>
           <link rel="preconnect" href="https://fonts.googleapis.com" />
-          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+          <link
+            rel="preconnect"
+            href="https://fonts.gstatic.com"
+            crossOrigin=""
+          />
         </head>
         <body className={`${inter.className} antialiased`}>
           <ThemeProvider
@@ -114,25 +124,26 @@ export default function RootLayout({ children }) {
               <div className="fixed inset-0 z-0 pointer-events-none">
                 <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900/10 to-slate-900" />
                 <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
-                <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}} />
+                <div
+                  className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse"
+                  style={{ animationDelay: "2s" }}
+                />
               </div>
-              
+
               {/* Content */}
-              <div className="relative z-10">
-                {children}
-              </div>
+              <div className="relative z-10">{children}</div>
             </main>
 
             {/* Enhanced Toaster */}
-            <Toaster 
-              richColors 
+            <Toaster
+              richColors
               position="top-right"
               toastOptions={{
                 style: {
-                  background: 'rgba(15, 23, 42, 0.9)',
-                  backdropFilter: 'blur(12px)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  color: '#f8fafc',
+                  background: "rgba(15, 23, 42, 0.9)",
+                  backdropFilter: "blur(12px)",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  color: "#f8fafc",
                 },
               }}
             />
@@ -147,8 +158,9 @@ export default function RootLayout({ children }) {
                       AI Career Coach
                     </h3>
                     <p className="text-slate-300 mb-4 leading-relaxed">
-                      Empowering professionals worldwide with AI-driven career guidance, 
-                      interview preparation, and personalized growth strategies.
+                      Empowering professionals worldwide with AI-driven career
+                      guidance, interview preparation, and personalized growth
+                      strategies.
                     </p>
                     <div className="flex space-x-4">
                       <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
@@ -165,22 +177,34 @@ export default function RootLayout({ children }) {
                     </h4>
                     <ul className="space-y-2">
                       <li>
-                        <a href="/dashboard" className="text-slate-300 hover:text-blue-400 transition-colors">
+                        <Link
+                          href="/dashboard"
+                          className="text-slate-300 hover:text-blue-400 transition-colors"
+                        >
                           Dashboard
-                        </a>
+                        </Link>
                       </li>
                       <li>
-                        <a href="/resume" className="text-slate-300 hover:text-blue-400 transition-colors">
+                        <Link
+                          href="/resume"
+                          className="text-slate-300 hover:text-blue-400 transition-colors"
+                        >
                           Resume Builder
-                        </a>
+                        </Link>
                       </li>
                       <li>
-                        <a href="/interview" className="text-slate-300 hover:text-blue-400 transition-colors">
+                        <Link
+                          href="/interview"
+                          className="text-slate-300 hover:text-blue-400 transition-colors"
+                        >
                           Interview Prep
-                        </a>
+                        </Link>
                       </li>
                       <li>
-                        <Link href="/ai-cover-letter" className="text-slate-300 hover:text-blue-400 transition-colors">
+                        <Link
+                          href="/ai-cover-letter"
+                          className="text-slate-300 hover:text-blue-400 transition-colors"
+                        >
                           Cover Letters
                         </Link>
                       </li>
@@ -194,24 +218,36 @@ export default function RootLayout({ children }) {
                     </h4>
                     <ul className="space-y-2">
                       <li>
-                        <a href="/help" className="text-slate-300 hover:text-blue-400 transition-colors">
+                        <Link
+                          href="/help"
+                          className="text-slate-300 hover:text-blue-400 transition-colors"
+                        >
                           Help Center
-                        </a>
+                        </Link>
                       </li>
                       <li>
-                        <a href="/contact" className="text-slate-300 hover:text-blue-400 transition-colors">
+                        <Link
+                          href="/contact"
+                          className="text-slate-300 hover:text-blue-400 transition-colors"
+                        >
                           Contact Us
-                        </a>
+                        </Link>
                       </li>
                       <li>
-                        <a href="/privacy" className="text-slate-300 hover:text-blue-400 transition-colors">
+                        <Link
+                          href="/privacy"
+                          className="text-slate-300 hover:text-blue-400 transition-colors"
+                        >
                           Privacy Policy
-                        </a>
+                        </Link>
                       </li>
                       <li>
-                        <a href="/terms" className="text-slate-300 hover:text-blue-400 transition-colors">
+                        <Link
+                          href="/terms"
+                          className="text-slate-300 hover:text-blue-400 transition-colors"
+                        >
                           Terms of Service
-                        </a>
+                        </Link>
                       </li>
                     </ul>
                   </div>
@@ -221,9 +257,11 @@ export default function RootLayout({ children }) {
                 <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center">
                   <div className="text-slate-400 text-center md:text-left mb-4 md:mb-0">
                     <p className="flex items-center justify-center md:justify-start">
-                      Made with 
-                      <span className="mx-1 text-red-400 animate-pulse">❤️</span> 
-                      by 
+                      Made with
+                      <span className="mx-1 text-red-400 animate-pulse">
+                        ❤️
+                      </span>
+                      by
                       <span className="ml-1 gradient-text-primary font-semibold">
                         Sanjay
                       </span>
