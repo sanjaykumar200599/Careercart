@@ -52,6 +52,7 @@ import Header from "@/components/header";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import { Toaster } from "sonner";
+import Link from "next/link";
 
 const inter = Inter({ subsets: ["latin"] }); // font
 
@@ -179,9 +180,9 @@ export default function RootLayout({ children }) {
                         </a>
                       </li>
                       <li>
-                        <a href="/ai-cover-letter" className="text-slate-300 hover:text-blue-400 transition-colors">
+                        <Link href="/ai-cover-letter" className="text-slate-300 hover:text-blue-400 transition-colors">
                           Cover Letters
-                        </a>
+                        </Link>
                       </li>
                     </ul>
                   </div>
