@@ -9,7 +9,7 @@ const genAI = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
 });
 
-// Gemini model
+// Gemini-2.5-flash model
 const modelName = "gemini-2.5-flash";
 
 /* ----------------------------- */
