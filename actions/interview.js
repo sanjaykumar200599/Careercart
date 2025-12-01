@@ -2,29 +2,32 @@
 
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+// Initialize Google GenAI client
+const genAI = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY,
+});
 
+// Supported Gemini 3 model
+const modelName = "gemini-2.5-flash";
+
+/**
+ * Generate 10 technical interview questions for the logged-in user
+ */
 export async function generateQuiz() {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
   const user = await db.user.findUnique({
     where: { clerkUserId: userId },
-    select: {
-      industry: true,
-      skills: true,
-    },
+    select: { industry: true, skills: true },
   });
 
   if (!user) throw new Error("User not found");
 
   const prompt = `
-    Generate 10 technical interview questions for a ${
-      user.industry
-    } professional${
+    Generate 10 technical interview questions for a ${user.industry} professional${
     user.skills?.length ? ` with expertise in ${user.skills.join(", ")}` : ""
   }.
     
@@ -42,13 +45,15 @@ export async function generateQuiz() {
       ]
     }
   `;
-  
+
   try {
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    const text = response.text();
-    const cleanedText = text.replace(/```(?:json)?\n?/g, "").trim();
-    const quiz = JSON.parse(cleanedText);
+    const result = await genAI.models.generateContent({
+      model: modelName,
+      contents: prompt,
+    });
+
+    const text = result.text.replace(/```(?:json)?\n?/g, "").trim();
+    const quiz = JSON.parse(text);
 
     return quiz.questions;
   } catch (error) {
@@ -57,14 +62,14 @@ export async function generateQuiz() {
   }
 }
 
+/**
+ * Save quiz result and optionally generate improvement tips
+ */
 export async function saveQuizResult(questions, answers, score) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
-
+  const user = await db.user.findUnique({ where: { clerkUserId: userId } });
   if (!user) throw new Error("User not found");
 
   const questionResults = questions.map((q, index) => ({
@@ -75,11 +80,10 @@ export async function saveQuizResult(questions, answers, score) {
     explanation: q.explanation,
   }));
 
-  // Get wrong answers
-  const wrongAnswers = questionResults.filter((q) => !q.isCorrect);
-
   // Only generate improvement tips if there are wrong answers
   let improvementTip = null;
+  const wrongAnswers = questionResults.filter((q) => !q.isCorrect);
+
   if (wrongAnswers.length > 0) {
     const wrongQuestionsText = wrongAnswers
       .map(
@@ -100,13 +104,14 @@ export async function saveQuizResult(questions, answers, score) {
     `;
 
     try {
-      const tipResult = await model.generateContent(improvementPrompt);
+      const tipResult = await genAI.models.generateContent({
+        model: modelName,
+        contents: improvementPrompt,
+      });
 
-      improvementTip = tipResult.response.text().trim();
-      console.log(improvementTip);
+      improvementTip = tipResult.text.trim();
     } catch (error) {
       console.error("Error generating improvement tip:", error);
-      // Continue without improvement tip if generation fails
     }
   }
 
@@ -128,24 +133,20 @@ export async function saveQuizResult(questions, answers, score) {
   }
 }
 
+/**
+ * Fetch all assessments for the logged-in user
+ */
 export async function getAssessments() {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
-
+  const user = await db.user.findUnique({ where: { clerkUserId: userId } });
   if (!user) throw new Error("User not found");
 
   try {
     const assessments = await db.assessment.findMany({
-      where: {
-        userId: user.id,
-      },
-      orderBy: {
-        createdAt: "asc",
-      },
+      where: { userId: user.id },
+      orderBy: { createdAt: "asc" },
     });
 
     return assessments;
