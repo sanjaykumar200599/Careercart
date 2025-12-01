@@ -9,7 +9,7 @@ const genAI = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
 });
 
-// Supported Gemini 3 model
+// Supported Gemini 2.5 model
 const modelName = "gemini-2.5-flash";
 
 export async function generateCoverLetter(data) {
@@ -49,8 +49,15 @@ export async function generateCoverLetter(data) {
   `;
 
   try {
-    const result = await model.generateContent(prompt);
-    const content = result.response.text().trim();
+    // Use genAI to generate text
+    const result = await genAI.generateText({
+      model: modelName,
+      prompt,
+      temperature: 0.7,
+      maxOutputTokens: 1024,
+    });
+
+    const content = result.candidates?.[0]?.content?.trim() || "";
 
     const coverLetter = await db.coverLetter.create({
       data: {
