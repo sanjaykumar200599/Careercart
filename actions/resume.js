@@ -6,13 +6,12 @@ import { GoogleGenAI } from "@google/genai";
 
 import { revalidatePath } from "next/cache";
 
-// Initialize Google GenAI client
 const genAI = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
 });
 
 // Supported Gemini 2.5 model
-const modelName = "gemini-2.5-flash";
+const model= "gemini-2.5-flash";
 
 export async function saveResume(content) {
   const { userId } = await auth();
@@ -93,15 +92,9 @@ export async function improveWithAI({ current, type }) {
   `;
 
   try {
-    // Use genAI to generate improved content
-    const result = await genAI.generateText({
-      model: modelName,
-      prompt,
-      temperature: 0.7,
-      maxOutputTokens: 512,
-    });
-
-    const improvedContent = result.candidates?.[0]?.content?.trim() || "";
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+    const improvedContent = response.text().trim();
     return improvedContent;
   } catch (error) {
     console.error("Error improving content:", error);

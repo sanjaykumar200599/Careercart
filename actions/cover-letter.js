@@ -10,7 +10,7 @@ const genAI = new GoogleGenAI({
 });
 
 // Supported Gemini 2.5 model
-const modelName = "gemini-2.5-flash";
+const model = "gemini-2.5-flash";
 
 export async function generateCoverLetter(data) {
   const { userId } = await auth();
@@ -51,7 +51,7 @@ export async function generateCoverLetter(data) {
   try {
     // Use genAI to generate text
     const result = await genAI.generateText({
-      model: modelName,
+      model: model,
       prompt,
       temperature: 0.7,
       maxOutputTokens: 1024,

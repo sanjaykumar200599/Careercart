@@ -10,7 +10,7 @@ const genAI = new GoogleGenAI({
 });
 
 // Supported Gemini 2.5 model
-const modelName = "gemini-2.5-flash";
+const model= "gemini-2.5-flash";
 
 export const generateAIInsights = async (industry) => {
   const prompt = `
@@ -35,7 +35,7 @@ export const generateAIInsights = async (industry) => {
 
   try {
     const result = await genAI.generateText({
-      model: modelName,
+      model: model,
       prompt,
       temperature: 0.7,
       maxOutputTokens: 1024,
