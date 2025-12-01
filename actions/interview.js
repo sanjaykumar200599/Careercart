@@ -9,12 +9,24 @@ const genAI = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
 });
 
-// Supported Gemini 3 model
+// Gemini model
 const modelName = "gemini-2.5-flash";
 
-/**
- * Generate 10 technical interview questions for the logged-in user
- */
+/* ----------------------------- */
+/* Extract text safely from GenAI */
+/* ----------------------------- */
+function extractText(result) {
+  try {
+    return result.candidates[0].content.parts[0].text;
+  } catch (err) {
+    console.error("Gemini extractText() failed:", err);
+    throw new Error("Invalid AI response format");
+  }
+}
+
+/* -------------------------------------------------------- */
+/*                     GENERATE QUIZ                        */
+/* -------------------------------------------------------- */
 export async function generateQuiz() {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
@@ -28,12 +40,12 @@ export async function generateQuiz() {
 
   const prompt = `
     Generate 10 technical interview questions for a ${user.industry} professional${
-    user.skills?.length ? ` with expertise in ${user.skills.join(", ")}` : ""
-  }.
-    
+      user.skills?.length ? ` with expertise in ${user.skills.join(", ")}` : ""
+    }.
+
     Each question should be multiple choice with 4 options.
-    
-    Return the response in this JSON format only, no additional text:
+
+    Return ONLY this JSON format:
     {
       "questions": [
         {
@@ -49,11 +61,19 @@ export async function generateQuiz() {
   try {
     const result = await genAI.models.generateContent({
       model: modelName,
-      contents: prompt,
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: prompt }],
+        },
+      ],
     });
 
-    const text = result.text.replace(/```(?:json)?\n?/g, "").trim();
-    const quiz = JSON.parse(text);
+    const aiText = extractText(result)
+      .replace(/```json|```/g, "")
+      .trim();
+
+    const quiz = JSON.parse(aiText);
 
     return quiz.questions;
   } catch (error) {
@@ -62,14 +82,17 @@ export async function generateQuiz() {
   }
 }
 
-/**
- * Save quiz result and optionally generate improvement tips
- */
+/* -------------------------------------------------------- */
+/*                 SAVE QUIZ RESULT + TIPS                  */
+/* -------------------------------------------------------- */
 export async function saveQuizResult(questions, answers, score) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  const user = await db.user.findUnique({ where: { clerkUserId: userId } });
+  const user = await db.user.findUnique({
+    where: { clerkUserId: userId },
+  });
+
   if (!user) throw new Error("User not found");
 
   const questionResults = questions.map((q, index) => ({
@@ -80,43 +103,48 @@ export async function saveQuizResult(questions, answers, score) {
     explanation: q.explanation,
   }));
 
-  // Only generate improvement tips if there are wrong answers
+  // Generate improvement tip if needed
   let improvementTip = null;
+
   const wrongAnswers = questionResults.filter((q) => !q.isCorrect);
 
   if (wrongAnswers.length > 0) {
-    const wrongQuestionsText = wrongAnswers
+    const wrongText = wrongAnswers
       .map(
         (q) =>
-          `Question: "${q.question}"\nCorrect Answer: "${q.answer}"\nUser Answer: "${q.userAnswer}"`
+          `Q: ${q.question}\nCorrect: ${q.answer}\nYour Answer: ${q.userAnswer}`
       )
       .join("\n\n");
 
-    const improvementPrompt = `
-      The user got the following ${user.industry} technical interview questions wrong:
+    const tipPrompt = `
+      The user missed these questions in a ${user.industry} technical quiz:
 
-      ${wrongQuestionsText}
+      ${wrongText}
 
-      Based on these mistakes, provide a concise, specific improvement tip.
-      Focus on the knowledge gaps revealed by these wrong answers.
-      Keep the response under 2 sentences and make it encouraging.
-      Don't explicitly mention the mistakes, instead focus on what to learn/practice.
+      Provide one short improvement tip (max 2 sentences). 
+      Focus on what to learn, NOT the mistakes.
     `;
 
     try {
       const tipResult = await genAI.models.generateContent({
         model: modelName,
-        contents: improvementPrompt,
+        contents: [
+          {
+            role: "user",
+            parts: [{ text: tipPrompt }],
+          },
+        ],
       });
 
-      improvementTip = tipResult.text.trim();
+      improvementTip = extractText(tipResult).trim();
     } catch (error) {
       console.error("Error generating improvement tip:", error);
     }
   }
 
+  // Save to DB
   try {
-    const assessment = await db.assessment.create({
+    return await db.assessment.create({
       data: {
         userId: user.id,
         quizScore: score,
@@ -125,31 +153,30 @@ export async function saveQuizResult(questions, answers, score) {
         improvementTip,
       },
     });
-
-    return assessment;
   } catch (error) {
     console.error("Error saving quiz result:", error);
     throw new Error("Failed to save quiz result");
   }
 }
 
-/**
- * Fetch all assessments for the logged-in user
- */
+/* -------------------------------------------------------- */
+/*                   GET USER ASSESSMENTS                   */
+/* -------------------------------------------------------- */
 export async function getAssessments() {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  const user = await db.user.findUnique({ where: { clerkUserId: userId } });
+  const user = await db.user.findUnique({
+    where: { clerkUserId: userId },
+  });
+
   if (!user) throw new Error("User not found");
 
   try {
-    const assessments = await db.assessment.findMany({
+    return await db.assessment.findMany({
       where: { userId: user.id },
       orderBy: { createdAt: "asc" },
     });
-
-    return assessments;
   } catch (error) {
     console.error("Error fetching assessments:", error);
     throw new Error("Failed to fetch assessments");
