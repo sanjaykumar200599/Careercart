@@ -92,10 +92,12 @@ export async function improveWithAI({ current, type }) {
   `;
 
   try {
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    const improvedContent = response.text().trim();
-    return improvedContent;
+      const result = await genAI.models.generateContent({
+        model,
+        contents: prompt,
+      });
+
+      return result.text.trim();
   } catch (error) {
     console.error("Error improving content:", error);
     throw new Error("Failed to improve content");
